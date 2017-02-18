@@ -20,17 +20,18 @@ if __name__ == '__main__':
         )
         cv2.imshow('image', skin_img)
         cv2.waitKey(0)
-        cv2.destroyAllWindows()
-    img = load_image('data/lenna.jpg', True)
+        cv2.destroyAllWindows()'''
+    non_parametric_skin_detector = NonParametricSkinDetector()
+    folders = [('data/Pratheepan_Dataset/FacePhoto/',
+                'data/Ground_Truth/GroundT_FacePhoto/')]
+    non_parametric_skin_detector.create_skin_models(folders)
+    img = load_image('data/Pratheepan_Dataset/FacePhoto/920480_f520.jpg', True)
     cv2.imshow('image', img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-    skin_img = explicit_skin_detector.draw_skin(
+    skin_img = non_parametric_skin_detector.draw_skin(
         img, (255, 255, 255), (0, 0, 0)
     )
     cv2.imshow('image', skin_img)
     cv2.waitKey(0)
-    cv2.destroyAllWindows()'''
-    skin_detector = NonParametricSkinDetector()
-    skin_detector.create_skin_models([("data/Pratheepan_Dataset/FacePhoto/",
-                                      "data/Ground_Truth/GroundT_FacePhoto/")])
+    cv2.destroyAllWindows()

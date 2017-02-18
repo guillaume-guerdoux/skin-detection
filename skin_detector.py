@@ -5,20 +5,7 @@ import cv2
 from utils import *
 
 
-class ExplicitSkinDetector:
-
-    def is_skin_pixel(self, pixel):
-        # pixel : (B, G, R)
-        B = pixel[0]
-        G = pixel[1]
-        R = pixel[2]
-        # Formula in assets/gc2003vsa.pdf article
-        if R > 95 and G > 40 and B > 20 and \
-           (max(R, G, B) - min(R, G, B)) > 15 and \
-           abs(int(R) - int(G)) > 15 and R > G and R > B:
-                return True
-        else:
-            return False
+class SkinDetector:
 
     def draw_skin(self, img, color_for_skin, color_for_not_skin):
         # img is a cv image
@@ -33,7 +20,23 @@ class ExplicitSkinDetector:
         return img
 
 
-class NonParametricSkinDetector:
+class ExplicitSkinDetector(SkinDetector):
+
+    def is_skin_pixel(self, pixel):
+        # pixel : (B, G, R)
+        B = pixel[0]
+        G = pixel[1]
+        R = pixel[2]
+        # Formula in assets/gc2003vsa.pdf article
+        if R > 95 and G > 40 and B > 20 and \
+           (max(R, G, B) - min(R, G, B)) > 15 and \
+           abs(int(R) - int(G)) > 15 and R > G and R > B:
+                return True
+        else:
+            return False
+
+
+class NonParametricSkinDetector(SkinDetector):
 
     def create_skin_models(self, folders):
         '''folder : lists of differents sample folders
@@ -61,3 +64,20 @@ class NonParametricSkinDetector:
                 )
         skin_models = np.divide(skin_models, sum(sum(skin_models)))
         non_skin_models = np.divide(non_skin_models, sum(sum(non_skin_models)))
+        self.skin_models = skin_models
+        self.non_skin_models = non_skin_models
+
+    def is_skin_pixel(self, pixel):
+        # pixel : (B, G, R)
+        # 256 bins to 32 bins transformation
+        B = int(pixel[0]/8)
+        G = int(pixel[1]/8)
+        R = int(pixel[2]/8)
+        '''if R in self.red_list and G in self.green_list:
+            print(R, G)'''
+        p_skin = self.skin_models[R][G]
+        p_non_skin = self.non_skin_models[R][G]
+        if p_skin >= p_non_skin:
+            return True
+        else:
+            return False
