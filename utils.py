@@ -43,4 +43,4 @@ if __name__ == '__main__':
     '''cv2.imshow('image', img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()'''
-    BGR_skin_histogram(bgr_img, black_and_white_img)
+    print(gray_histo(black_and_white_img, None, [256], [0, 256])[255][0] - 2)

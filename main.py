@@ -1,5 +1,6 @@
 from skin_detector import ExplicitSkinDetector
 from skin_detector import NonParametricSkinDetector
+from skin_detector import Judge
 from utils import *
 
 import numpy as np
@@ -21,11 +22,13 @@ if __name__ == '__main__':
         cv2.imshow('image', skin_img)
         cv2.waitKey(0)
         cv2.destroyAllWindows()'''
-    non_parametric_skin_detector = NonParametricSkinDetector()
-    folders = [('data/Pratheepan_Dataset/FacePhoto/',
-                'data/Ground_Truth/GroundT_FacePhoto/')]
-    non_parametric_skin_detector.create_skin_models(folders)
-    img = load_image('data/Pratheepan_Dataset/FacePhoto/920480_f520.jpg', True)
+    learning_folders = [('data/Pratheepan_Dataset/FacePhoto/',
+                         'data/Ground_Truth/GroundT_FacePhoto/')]
+    non_parametric_skin_detector = NonParametricSkinDetector(learning_folders)
+    # explicit_skin_detector = ExplicitSkinDetector()
+    judge = Judge(explicit_skin_detector, learning_folders)
+    judge.get_recall_precision()
+    '''img = load_image('data/Pratheepan_Dataset/FacePhoto/920480_f520.jpg', True)
     cv2.imshow('image', img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
@@ -34,4 +37,4 @@ if __name__ == '__main__':
     )
     cv2.imshow('image', skin_img)
     cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    cv2.destroyAllWindows()'''
