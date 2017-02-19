@@ -184,3 +184,53 @@ class NonParametricHSVSkinDetector(SkinDetector):
             return True
         else:
             return False
+
+
+class NonParametricLABSkinDetector(SkinDetector):
+
+    def __init__(self, learning_folders):
+        skin_models = self.create_skin_models(learning_folders)
+        self.skin_model = skin_models[0]
+        self.non_skin_model = skin_models[1]
+
+    def create_skin_models(self, learning_folders):
+        '''learning_folders : lists of differents sample learning_folders
+        Two arrays dimension (a and b) : 0 -> 256 0 -> 256
+        One array skin model : nb of skin pixel in image
+        One array non skin model : nb of non skin pixel in image'''
+        skin_model = np.zeros((180, 256))
+        non_skin_model = np.zeros((180, 256))
+        for folder in learning_folders:
+            for filename in os.listdir(folder[0]):
+                color_img = load_image(folder[0] + filename, True)
+                lab_img = BGR_to_Lab(color_img)
+                black_and_white_img = load_image(
+                    folder[1] + os.path.splitext(filename)[0]+'.png', True)
+                inversed_black_and_white_img = \
+                    inverse_image(black_and_white_img)
+                temp_skin_histogram = HSV_histogram(
+                    lab_img, black_and_white_img
+                )
+                skin_model = np.add(skin_model, temp_skin_histogram)
+                temp_non_skin_histogram = HSV_histogram(
+                    lab_img, inversed_black_and_white_img
+                )
+                non_skin_model = np.add(
+                    non_skin_model, temp_non_skin_histogram
+                )
+        skin_model = np.divide(skin_model, sum(sum(skin_model)))
+        non_skin_model = np.divide(non_skin_model, sum(sum(non_skin_model)))
+        return skin_model, non_skin_model
+
+    def is_skin_pixel(self, pixel):
+        # pixel : (L, a, b)
+        # 256 bins to 32 bins transformation
+        L = pixel[0]
+        a = pixel[1]
+        b = pixel[2]
+        p_skin = self.skin_model[a][b]
+        p_non_skin = self.non_skin_model[a][b]
+        if p_skin >= p_non_skin:
+            return True
+        else:
+            return False

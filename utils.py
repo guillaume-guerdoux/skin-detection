@@ -22,7 +22,7 @@ def BGR_to_HSV(img):
 
 
 def BGR_to_Lab(img):
-    return cv2.cvtColor(img, cv2.CV_BGR2Lab)
+    return cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
 
 
 # http://www.pyimagesearch.com/2014/01/22/clever-girl-a-guide-to-utilizing-color-histograms-for-computer-vision-and-image-search-engines/
@@ -38,17 +38,24 @@ def HSV_histogram(hsv_img, black_and_white_img):
                         [180, 256], [0, 180, 0, 256])
     return hist
 
+
+def Lab_histogram(lab_img, black_and_white_img):
+    hist = cv2.calcHist([lab_img], [1, 2], black_and_white_img[:, :, 0],
+                        [256, 256], [0, 256, 0, 256])
+    return hist
+
+
 if __name__ == '__main__':
     # data/Ground_Truth/GroundT_FacePhoto/06Apr03Face.png
     # data/Pratheepan_Dataset/FacePhoto/06Apr03Face.jpg
     bgr_img = load_image("data/Pratheepan_Dataset/FacePhoto/06Apr03Face.jpg",
                          True)
-    hsv_img = BGR_to_HSV(bgr_img)
+    hsv_img = BGR_to_Lab(bgr_img)
     black_and_white_img = load_image(
         "data/Ground_Truth/GroundT_FacePhoto/06Apr03Face.png", True)
     '''cv2.imshow('image', img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()'''
-    histo = HSV_histogram(hsv_img, black_and_white_img)
+    histo = Lab_histogram(hsv_img, black_and_white_img)
     print(histo)
     print(histo.shape)

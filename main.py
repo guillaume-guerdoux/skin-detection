@@ -1,6 +1,7 @@
 from skin_detector import ExplicitSkinDetector
 from skin_detector import NonParametricBGRSkinDetector
 from skin_detector import NonParametricHSVSkinDetector
+from skin_detector import NonParametricLABSkinDetector
 from skin_detector import Judge
 from utils import *
 
@@ -28,12 +29,13 @@ if __name__ == '__main__':
     test_folders = [('data/Pratheepan_Dataset/FamilyPhoto/',
                      'data/Ground_Truth/GroundT_FamilyPhoto/')]
     # non_parametric_skin_detector = NonParametricBGRSkinDetector(learning_folders)
-    non_parametric_skin_detector = NonParametricHSVSkinDetector(learning_folders)
+    # non_parametric_skin_detector = NonParametricHSVSkinDetector(learning_folders)
+    non_parametric_skin_detector = NonParametricLABSkinDetector(learning_folders)
     # explicit_skin_detector = ExplicitSkinDetector()
     # judge = Judge(non_parametric_skin_detector, learning_folders)
     # judge.get_recall_precision()
     img = load_image('data/tabatha.jpg', True)
-    hsv_img = BGR_to_HSV(img)
+    hsv_img = BGR_to_Lab(img)
     cv2.imshow('image', hsv_img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
