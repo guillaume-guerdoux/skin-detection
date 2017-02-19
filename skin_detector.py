@@ -85,7 +85,13 @@ class ExplicitSkinDetector(SkinDetector):
             return False
 
 
-class NonParametricBGRSkinDetector(SkinDetector):
+class NonParametricSkinDetector(SkinDetector):
+
+    def create_skin_models(self):
+        pass
+
+
+class NonParametricBGRSkinDetector(NonParametricSkinDetector):
 
     def __init__(self, learning_folders):
         skin_models = self.create_skin_models(learning_folders)
@@ -136,7 +142,7 @@ class NonParametricBGRSkinDetector(SkinDetector):
             return False
 
 
-class NonParametricHSVSkinDetector(SkinDetector):
+class NonParametricHSVSkinDetector(NonParametricSkinDetector):
 
     def __init__(self, learning_folders):
         skin_models = self.create_skin_models(learning_folders)
@@ -186,7 +192,7 @@ class NonParametricHSVSkinDetector(SkinDetector):
             return False
 
 
-class NonParametricLABSkinDetector(SkinDetector):
+class NonParametricLABSkinDetector(NonParametricSkinDetector):
 
     def __init__(self, learning_folders):
         skin_models = self.create_skin_models(learning_folders)
