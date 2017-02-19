@@ -46,12 +46,12 @@ class Judge:
                             print("ok")
                 recall = true_positive/(true_positive + false_positive)
                 precision = true_positive/(true_positive + false_negative)
-                print('Recall', recall)
-                print("Precision", precision)
+                # print('Recall', recall)
+                # print("Precision", precision)
                 recalls.append(recall)
                 precisions.append(precision)
-        # print('Mean recall', (sum(recalls)/len(recalls)))
-        # print('Mean precision', (sum(precisions)/len(precisions)))
+        print('Mean recall', (sum(recalls)/len(recalls)))
+        print('Mean precision', (sum(precisions)/len(precisions)))
 
 
 class SkinDetector:
@@ -85,7 +85,7 @@ class ExplicitSkinDetector(SkinDetector):
             return False
 
 
-class NonParametricSkinDetector(SkinDetector):
+class NonParametricBGRSkinDetector(SkinDetector):
 
     def __init__(self, learning_folders):
         skin_models = self.create_skin_models(learning_folders)
@@ -130,6 +130,56 @@ class NonParametricSkinDetector(SkinDetector):
             print(R, G)'''
         p_skin = self.skin_model[R][G]
         p_non_skin = self.non_skin_model[R][G]
+        if p_skin >= p_non_skin:
+            return True
+        else:
+            return False
+
+
+class NonParametricHSVSkinDetector(SkinDetector):
+
+    def __init__(self, learning_folders):
+        skin_models = self.create_skin_models(learning_folders)
+        self.skin_model = skin_models[0]
+        self.non_skin_model = skin_models[1]
+
+    def create_skin_models(self, learning_folders):
+        '''learning_folders : lists of differents sample learning_folders
+        Two arrays dimension (a and b) : 0 -> 256 0 -> 256
+        One array skin model : nb of skin pixel in image
+        One array non skin model : nb of non skin pixel in image'''
+        skin_model = np.zeros((180, 256))
+        non_skin_model = np.zeros((180, 256))
+        for folder in learning_folders:
+            for filename in os.listdir(folder[0]):
+                color_img = load_image(folder[0] + filename, True)
+                hsv_img = BGR_to_HSV(color_img)
+                black_and_white_img = load_image(
+                    folder[1] + os.path.splitext(filename)[0]+'.png', True)
+                inversed_black_and_white_img = \
+                    inverse_image(black_and_white_img)
+                temp_skin_histogram = HSV_histogram(
+                    hsv_img, black_and_white_img
+                )
+                skin_model = np.add(skin_model, temp_skin_histogram)
+                temp_non_skin_histogram = HSV_histogram(
+                    hsv_img, inversed_black_and_white_img
+                )
+                non_skin_model = np.add(
+                    non_skin_model, temp_non_skin_histogram
+                )
+        skin_model = np.divide(skin_model, sum(sum(skin_model)))
+        non_skin_model = np.divide(non_skin_model, sum(sum(non_skin_model)))
+        return skin_model, non_skin_model
+
+    def is_skin_pixel(self, pixel):
+        # pixel : (H, S, V)
+        # 256 bins to 32 bins transformation
+        H = pixel[0]
+        S = pixel[1]
+        V = pixel[2]
+        p_skin = self.skin_model[H][S]
+        p_non_skin = self.non_skin_model[H][S]
         if p_skin >= p_non_skin:
             return True
         else:

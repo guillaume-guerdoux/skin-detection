@@ -33,14 +33,22 @@ def BGR_histogram(bgr_img, black_and_white_img):
     return hist
 
 
+def HSV_histogram(hsv_img, black_and_white_img):
+    hist = cv2.calcHist([hsv_img], [0, 1], black_and_white_img[:, :, 0],
+                        [180, 256], [0, 180, 0, 256])
+    return hist
+
 if __name__ == '__main__':
     # data/Ground_Truth/GroundT_FacePhoto/06Apr03Face.png
     # data/Pratheepan_Dataset/FacePhoto/06Apr03Face.jpg
     bgr_img = load_image("data/Pratheepan_Dataset/FacePhoto/06Apr03Face.jpg",
                          True)
+    hsv_img = BGR_to_HSV(bgr_img)
     black_and_white_img = load_image(
         "data/Ground_Truth/GroundT_FacePhoto/06Apr03Face.png", True)
     '''cv2.imshow('image', img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()'''
-    print(gray_histo(black_and_white_img, None, [256], [0, 256])[255][0] - 2)
+    histo = HSV_histogram(hsv_img, black_and_white_img)
+    print(histo)
+    print(histo.shape)
